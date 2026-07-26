@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
   cpSync,
   mkdirSync,
@@ -10,12 +11,25 @@ import {
   writeFileSync
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, join, resolve } from "node:path";
+import {
+  basename,
+  join,
+  relative,
+  resolve
+} from "node:path";
 import { fileURLToPath } from "node:url";
 import { list as listTar } from "tar";
-import { parse as parseYaml } from "yaml";
+import {
+  parse as parseYaml,
+  stringify as stringifyYaml
+} from "yaml";
 
-import { pinImporterVersions } from "./package-verification-versions.mjs";
+import {
+  addPackedArchivesToConsumerLockfile,
+  createConsumerLockfile,
+  pinImporterVersions,
+  pinnedWorkspaceDependencyOverrides
+} from "./package-verification-versions.mjs";
 
 const repositoryRoot = resolve(
   fileURLToPath(new URL("..", import.meta.url))
@@ -26,6 +40,9 @@ const verificationRoot = mkdtempSync(
 const artifactsDirectory = join(verificationRoot, "artifacts");
 const workspaceLock = parseYaml(
   readFileSync(resolve(repositoryRoot, "pnpm-lock.yaml"), "utf8")
+);
+const workspaceManifest = JSON.parse(
+  readFileSync(resolve(repositoryRoot, "package.json"), "utf8")
 );
 const expectedPackageFiles = [
   "package/LICENSE",
@@ -289,6 +306,7 @@ function installAndBuildExample(exampleName, archives) {
 
   const manifestPath = join(consumer, "package.json");
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  manifest.packageManager = workspaceManifest.packageManager;
   const importer =
     workspaceLock.importers?.[`examples/${exampleName}`];
   if (!importer) {
@@ -303,17 +321,55 @@ function installAndBuildExample(exampleName, archives) {
   );
   manifest.pnpm ??= {};
   manifest.pnpm.overrides ??= {};
+  Object.assign(
+    manifest.pnpm.overrides,
+    pinnedWorkspaceDependencyOverrides(
+      workspaceLock,
+      packages,
+      new Set(archives.keys())
+    )
+  );
   manifest.pnpm.onlyBuiltDependencies = ["esbuild"];
+  const localArchives = [...archives.values()].map((archive) => ({
+    ...archive,
+    fileSpecifier: `file:${relative(
+      consumer,
+      archive.archivePath
+    ).replaceAll("\\", "/")}`,
+    integrity:
+      "sha512-" +
+      createHash("sha512")
+        .update(readFileSync(archive.archivePath))
+        .digest("base64")
+  }));
   for (const [packageName, archive] of archives) {
     if (manifest.dependencies?.[packageName]) {
-      manifest.dependencies[packageName] = `file:${archive.archivePath}`;
+      const fileSpecifier = localArchives.find(
+        (candidate) => candidate.archivePath === archive.archivePath
+      ).fileSpecifier;
+      manifest.dependencies[packageName] = fileSpecifier;
       manifest.pnpm.overrides[packageName] =
-        `file:${archive.archivePath}`;
+        fileSpecifier;
     }
   }
+  const consumerLock = createConsumerLockfile(
+    workspaceLock,
+    importer,
+    manifest,
+    new Set(archives.keys())
+  );
+  addPackedArchivesToConsumerLockfile(
+    consumerLock,
+    manifest,
+    localArchives
+  );
   writeFileSync(
     manifestPath,
     `${JSON.stringify(manifest, null, 2)}\n`
+  );
+  writeFileSync(
+    join(consumer, "pnpm-lock.yaml"),
+    stringifyYaml(consumerLock)
   );
 
   run(
