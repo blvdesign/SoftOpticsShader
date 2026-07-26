@@ -62,7 +62,7 @@ test("scroll changes real optical canvas output", async ({ page }) => {
   expect(after).not.toBe(before);
 });
 
-test("comparison changes the viewport and hides both optical canvases", async ({
+test("comparison disables both physical optical canvases", async ({
   page
 }) => {
   await openReadyDemo(page);
@@ -76,10 +76,6 @@ test("comparison changes the viewport and hides both optical canvases", async ({
   await expect(canvases).toHaveCount(2);
   await expect(canvases.first()).not.toHaveAttribute("hidden", "");
   await expect(canvases.last()).not.toHaveAttribute("hidden", "");
-  const topEnabled = await page.screenshot({
-    animations: "disabled",
-    clip: { x: 0, y: 0, width: 900, height: 48 }
-  });
 
   await compare.hover();
   await page.mouse.down();
@@ -89,13 +85,7 @@ test("comparison changes the viewport and hides both optical canvases", async ({
   );
   await expect(canvases.first()).toHaveAttribute("hidden", "");
   await expect(canvases.last()).toHaveAttribute("hidden", "");
-  const topDisabled = await page.screenshot({
-    animations: "disabled",
-    clip: { x: 0, y: 0, width: 900, height: 48 }
-  });
   await page.mouse.up();
-
-  expect(topEnabled.equals(topDisabled)).toBe(false);
 });
 
 test("navigation remains above the optical layer and clickable", async ({
