@@ -295,6 +295,12 @@ function assertCiContract(record) {
     "CI"
   );
   assertNodeSetup(actionStep(ci, "actions/setup-node"), "20.19.0");
+  const checkout = actionStep(ci, "actions/checkout");
+  assert.equal(
+    checkout?.with?.["fetch-depth"],
+    0,
+    "CI must fetch full history for Changesets divergence checks"
+  );
 
   const artifacts = actionStep(ci, "actions/upload-artifact");
   assert.equal(normalizeCondition(artifacts?.if), "failure()");
