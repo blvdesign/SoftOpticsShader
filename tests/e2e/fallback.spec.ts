@@ -67,7 +67,7 @@ test("WebGL2-unavailable mode uses two continuous fallback layers", async ({
   ).toBe(true);
 
   const video = page.getByLabel(
-    "Slowly moving translucent ribbon study"
+    "Moving high-contrast optical test signal"
   );
   await scrollElementToViewport(page, ".motion-frame", -300);
   await expect(video).toHaveAttribute(
@@ -76,7 +76,7 @@ test("WebGL2-unavailable mode uses two continuous fallback layers", async ({
   );
   await expect(video).toHaveAttribute(
     "src",
-    /media\/optical-motion\.webm$/
+    /media\/optical-test-signal\.webm$/
   );
   await expect
     .poll(() => video.evaluate((node) => node.currentTime))

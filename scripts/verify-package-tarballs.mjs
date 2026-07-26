@@ -307,6 +307,30 @@ function installAndBuildExample(exampleName, archives) {
   const manifestPath = join(consumer, "package.json");
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
   manifest.packageManager = workspaceManifest.packageManager;
+  delete manifest.devDependencies?.vite;
+  delete manifest.devDependencies?.["@vitejs/plugin-react"];
+  manifest.scripts = {
+    build: "tsc --noEmit"
+  };
+  const tsconfigPath = join(consumer, "tsconfig.json");
+  const tsconfig = JSON.parse(readFileSync(tsconfigPath, "utf8"));
+  tsconfig.compilerOptions.types = ["node"];
+  tsconfig.include = ["src"];
+  writeFileSync(
+    tsconfigPath,
+    `${JSON.stringify(tsconfig, null, 2)}\n`
+  );
+  writeFileSync(
+    join(consumer, "src", "import-meta.d.ts"),
+    [
+      "interface ImportMeta {",
+      "  readonly hot?: {",
+      "    dispose(callback: () => void): void;",
+      "  };",
+      "}",
+      ""
+    ].join("\n")
+  );
   const importer =
     workspaceLock.importers?.[`examples/${exampleName}`];
   if (!importer) {
@@ -408,9 +432,15 @@ function installAndBuildExample(exampleName, archives) {
     "dependencies",
     "devDependencies"
   ]) {
-    for (const [dependencyName, locked] of Object.entries(
-      importer[dependencyKind] ?? {}
+    for (const dependencyName of Object.keys(
+      manifest[dependencyKind] ?? {}
     )) {
+      const locked = importer[dependencyKind]?.[dependencyName];
+      if (!locked) {
+        throw new Error(
+          `${exampleName} has no locked ${dependencyName}.`
+        );
+      }
       const installed =
         installedReport?.[dependencyKind]?.[dependencyName];
       if (!installed) {

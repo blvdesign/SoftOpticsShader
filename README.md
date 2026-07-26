@@ -10,10 +10,9 @@ middle of the page untouched.
 [React example](./examples/react-vite) ·
 [Architecture](./docs/architecture.md)
 
-![A pale editorial ribbon demonstrating a soft optical boundary](./apps/demo/public/media/editorial-hero.webp)
-
-The demo artwork and motion are original project assets. Prompts, derivatives,
-and the video production command are recorded in
+The demo uses crisp HTML/CSS test surfaces so every softened or displaced pixel
+comes from the live shader. Its small local video is an unblurred geometric test
+signal; the reproducible production command is recorded in
 [demo media provenance](./apps/demo/public/media/README.md).
 
 ## What it does
@@ -370,7 +369,7 @@ pnpm install
 pnpm check
 ```
 
-Run the editorial demo with `pnpm dev`. `pnpm test:pack` builds both packages,
+Run the shader demo with `pnpm dev`. `pnpm test:pack` builds both packages,
 checks the exact tarball allowlist and dependency metadata, installs those
 tarballs into isolated copies of both examples, builds the consumers, and
 probes ESM and CommonJS SSR imports.

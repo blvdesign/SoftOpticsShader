@@ -126,7 +126,7 @@ function OpticalMotionVideo() {
   return (
     <figure className="motion-frame">
       <video
-        aria-label="Slowly moving translucent ribbon study"
+        aria-label="Moving high-contrast optical test signal"
         data-soft-optics-live
         loop
         muted
@@ -134,10 +134,9 @@ function OpticalMotionVideo() {
           requestVideoPlayback(event, shouldPlay)
         }
         playsInline
-        poster={mediaPath("editorial-hero.webp")}
         preload="metadata"
         ref={videoRef}
-        src={mediaPath("optical-motion.webm")}
+        src={mediaPath("optical-test-signal.webm")}
       />
       <button
         aria-label={controlLabel}
@@ -246,17 +245,32 @@ export function App() {
         </section>
 
         <figure className="hero-media shell-wide" id="experience">
-          <img
-            alt="A translucent ivory ribbon bending through a soft optical field"
-            decoding="async"
-            fetchPriority="high"
-            height="941"
-            src={mediaPath("editorial-hero.webp")}
-            width="1672"
-          />
+          <div
+            aria-label="Crisp typography and geometry for observing the live viewport shader"
+            className="hero-media__surface"
+            data-optical-test-surface
+            role="img"
+          >
+            <div className="test-surface__masthead">
+              <span>Viewport optics / 01</span>
+              <span>Live DOM · no baked blur</span>
+            </div>
+            <div className="test-surface__title">
+              <span>Soft</span>
+              <span>Optics</span>
+            </div>
+            <div className="test-surface__target" aria-hidden="true">
+              <span />
+            </div>
+            <div className="test-surface__ruler" aria-hidden="true">
+              {Array.from({ length: 24 }, (_, index) => (
+                <span key={index} />
+              ))}
+            </div>
+          </div>
           <figcaption>
-            <span>01 / Progressive field</span>
-            <span>Blur · bend · disperse</span>
+            <span>01 / Real-time viewport field</span>
+            <span>Scroll · blur · bend · disperse</span>
           </figcaption>
         </figure>
 
@@ -301,14 +315,20 @@ export function App() {
         </section>
 
         <section className="detail-study shell">
-          <div className="detail-study__image">
-            <img
-              alt="An ivory membrane crossing a diagonal optical transition"
-              height="941"
-              loading="lazy"
-              src={mediaPath("editorial-detail.webp")}
-              width="1672"
-            />
+          <div
+            aria-label="Fine line and type test surface for observing refraction"
+            className="detail-study__field"
+            data-optical-test-surface
+            role="img"
+          >
+            <div className="detail-study__axis" aria-hidden="true" />
+            <strong>0123456789</strong>
+            <p>Sharp source / optical edge</p>
+            <div className="detail-study__ticks" aria-hidden="true">
+              {Array.from({ length: 14 }, (_, index) => (
+                <span key={index} />
+              ))}
+            </div>
           </div>
           <div className="detail-study__copy">
             <p className="eyebrow">What the shader preserves</p>

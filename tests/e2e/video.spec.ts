@@ -17,7 +17,7 @@ test("live video advances through the bottom optical edge", async ({
   await openReadyDemo(page);
   await waitForOptics(page);
   const video = page.getByLabel(
-    "Slowly moving translucent ribbon study"
+    "Moving high-contrast optical test signal"
   );
   await scrollElementToViewport(page, ".motion-frame", -500);
   await video.evaluate(async (node) => {

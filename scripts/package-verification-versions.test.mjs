@@ -46,6 +46,10 @@ test("pins external consumer dependencies to exact lockfile versions", () => {
       vite: {
         specifier: "^7.3.6",
         version: "7.3.6(@types/node@20.19.43)(yaml@2.9.0)"
+      },
+      unused: {
+        specifier: "1.0.0",
+        version: "1.0.0"
       }
     }
   };

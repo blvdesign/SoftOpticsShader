@@ -32,7 +32,7 @@ test("approved WebGL presentation states", async ({ page }) => {
   await scrollElementToViewport(page, ".motion-frame", -520);
   await seekVideoFrame(
     page,
-    page.getByLabel("Slowly moving translucent ribbon study"),
+    page.getByLabel("Moving high-contrast optical test signal"),
     0.4
   );
   await expect(page).toHaveScreenshot("desktop-video-bottom.png", {

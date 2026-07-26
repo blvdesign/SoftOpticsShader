@@ -55,7 +55,10 @@ export function createConsumerLockfile(
     for (const dependencyName of Object.keys(
       consumerImporter[dependencyKind] ?? {}
     )) {
-      if (localPackageNames.has(dependencyName)) {
+      if (
+        localPackageNames.has(dependencyName) ||
+        !manifest[dependencyKind]?.[dependencyName]
+      ) {
         delete consumerImporter[dependencyKind][dependencyName];
         continue;
       }

@@ -37,7 +37,17 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("editorial demo", () => {
+describe("shader demo", () => {
+  it("demonstrates the shader on crisp DOM surfaces instead of pre-blurred artwork", () => {
+    const { container } = render(<App />);
+
+    expect(container.querySelectorAll("img")).toHaveLength(0);
+    expect(
+      container.querySelectorAll("[data-optical-test-surface]")
+    ).toHaveLength(2);
+    expect(container.innerHTML).not.toContain("editorial-");
+  });
+
   it("keeps fixed interface layers outside the optical capture", () => {
     const { container } = render(<App />);
 
@@ -59,7 +69,7 @@ describe("editorial demo", () => {
 
     expect(video).not.toBeNull();
     expect(video?.getAttribute("src")).toContain(
-      "media/optical-motion.webm"
+      "media/optical-test-signal.webm"
     );
     expect(video?.hasAttribute("data-soft-optics-live")).toBe(true);
     expect(video?.hasAttribute("autoplay")).toBe(false);
