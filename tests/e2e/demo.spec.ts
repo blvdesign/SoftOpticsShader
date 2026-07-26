@@ -62,7 +62,7 @@ test("scroll changes real optical canvas output", async ({ page }) => {
   expect(after).not.toBe(before);
 });
 
-test("both physical viewport rows change when comparison disables optics", async ({
+test("comparison changes the viewport and hides both optical canvases", async ({
   page
 }) => {
   await openReadyDemo(page);
@@ -72,13 +72,14 @@ test("both physical viewport rows change when comparison disables optics", async
   const compare = page.getByRole("button", {
     name: "Compare without effect"
   });
-  const edgeRegion = (y: number) =>
-    page.screenshot({
-      animations: "disabled",
-      clip: { x: 0, y, width: 900, height: 48 }
-    });
-  const topEnabled = await edgeRegion(0);
-  const bottomEnabled = await edgeRegion(852);
+  const canvases = page.locator(EDGE_CANVAS_SELECTOR);
+  await expect(canvases).toHaveCount(2);
+  await expect(canvases.first()).not.toHaveAttribute("hidden", "");
+  await expect(canvases.last()).not.toHaveAttribute("hidden", "");
+  const topEnabled = await page.screenshot({
+    animations: "disabled",
+    clip: { x: 0, y: 0, width: 900, height: 48 }
+  });
 
   await compare.hover();
   await page.mouse.down();
@@ -86,12 +87,15 @@ test("both physical viewport rows change when comparison disables optics", async
     "data-optics-enabled",
     "false"
   );
-  const topDisabled = await edgeRegion(0);
-  const bottomDisabled = await edgeRegion(852);
+  await expect(canvases.first()).toHaveAttribute("hidden", "");
+  await expect(canvases.last()).toHaveAttribute("hidden", "");
+  const topDisabled = await page.screenshot({
+    animations: "disabled",
+    clip: { x: 0, y: 0, width: 900, height: 48 }
+  });
   await page.mouse.up();
 
   expect(topEnabled.equals(topDisabled)).toBe(false);
-  expect(bottomEnabled.equals(bottomDisabled)).toBe(false);
 });
 
 test("navigation remains above the optical layer and clickable", async ({
