@@ -72,13 +72,13 @@ test("both physical viewport rows change when comparison disables optics", async
   const compare = page.getByRole("button", {
     name: "Compare without effect"
   });
-  const row = (y: number) =>
+  const edgeRegion = (y: number) =>
     page.screenshot({
       animations: "disabled",
-      clip: { x: 0, y, width: 900, height: 4 }
+      clip: { x: 0, y, width: 900, height: 48 }
     });
-  const topEnabled = await row(0);
-  const bottomEnabled = await row(896);
+  const topEnabled = await edgeRegion(0);
+  const bottomEnabled = await edgeRegion(852);
 
   await compare.hover();
   await page.mouse.down();
@@ -86,8 +86,8 @@ test("both physical viewport rows change when comparison disables optics", async
     "data-optics-enabled",
     "false"
   );
-  const topDisabled = await row(0);
-  const bottomDisabled = await row(896);
+  const topDisabled = await edgeRegion(0);
+  const bottomDisabled = await edgeRegion(852);
   await page.mouse.up();
 
   expect(topEnabled.equals(topDisabled)).toBe(false);
