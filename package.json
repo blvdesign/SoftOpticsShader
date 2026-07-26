@@ -18,7 +18,7 @@
     "test:e2e:run": "playwright test tests/e2e tests/visual --pass-with-no-tests",
     "test:docs": "node scripts/verify-documentation.mjs && pnpm changeset status",
     "test:visual:update": "playwright test tests/visual --update-snapshots",
-    "test:pack": "node scripts/verify-package-tarballs.mjs",
+    "test:pack": "node --test scripts/package-verification-versions.test.mjs && node scripts/verify-package-tarballs.mjs",
     "test:run": "pnpm --filter @blvdesign/soft-optics build && pnpm test:run:workspace",
     "test:run:workspace": "pnpm -r --if-present test:run",
     "test:versions": "node --test scripts/sync-package-versions.test.mjs && node scripts/sync-package-versions.mjs --check",

@@ -15,6 +15,8 @@ import { fileURLToPath } from "node:url";
 import { list as listTar } from "tar";
 import { parse as parseYaml } from "yaml";
 
+import { pinImporterVersions } from "./package-verification-versions.mjs";
+
 const repositoryRoot = resolve(
   fileURLToPath(new URL("..", import.meta.url))
 );
@@ -287,6 +289,18 @@ function installAndBuildExample(exampleName, archives) {
 
   const manifestPath = join(consumer, "package.json");
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  const importer =
+    workspaceLock.importers?.[`examples/${exampleName}`];
+  if (!importer) {
+    throw new Error(
+      `${exampleName} is not represented in the committed pnpm lockfile.`
+    );
+  }
+  pinImporterVersions(
+    manifest,
+    importer,
+    new Set(archives.keys())
+  );
   manifest.pnpm ??= {};
   manifest.pnpm.overrides ??= {};
   manifest.pnpm.onlyBuiltDependencies = ["esbuild"];
@@ -326,13 +340,6 @@ function installAndBuildExample(exampleName, archives) {
     }
   }
 
-  const importer =
-    workspaceLock.importers?.[`examples/${exampleName}`];
-  if (!importer) {
-    throw new Error(
-      `${exampleName} is not represented in the committed pnpm lockfile.`
-    );
-  }
   const installedReport = JSON.parse(
     run(
       "pnpm",
