@@ -1,0 +1,53 @@
+{
+  "name": "@blvdesign/soft-optics",
+  "version": "0.1.0",
+  "description": "Framework-agnostic viewport-edge blur, refraction, and dispersion.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blvdesign/SoftOpticsShader.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/blvdesign/SoftOpticsShader#readme",
+  "bugs": {
+    "url": "https://github.com/blvdesign/SoftOpticsShader/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "prepack": "pnpm build",
+    "test": "vitest",
+    "test:run": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "tsup": "^8.5.1"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "dependencies": {
+    "modern-screenshot": "^4.7.0"
+  }
+}
