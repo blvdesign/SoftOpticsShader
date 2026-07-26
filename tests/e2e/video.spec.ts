@@ -4,7 +4,6 @@ import {
   captureAppeared,
   expect,
   openReadyDemo,
-  seekVideoFrame,
   scrollElementToViewport,
   test,
   waitForCaptureIdle,
@@ -37,13 +36,15 @@ test("live video advances through the bottom optical edge", async ({
   );
   await expect(bottomCanvas).toBeVisible();
 
-  await seekVideoFrame(page, video, 0.5);
   const earlyFrame = await canvasFingerprint(bottomCanvas);
-  await seekVideoFrame(page, video, 4.5);
-  const lateFrame = await canvasFingerprint(bottomCanvas);
 
   expect(earlyFrame).not.toBe(-1);
-  expect(lateFrame).not.toBe(earlyFrame);
+  await expect
+    .poll(() => canvasFingerprint(bottomCanvas), {
+      message: "live video frames should reach the optical canvas",
+      timeout: 3_000
+    })
+    .not.toBe(earlyFrame);
 });
 
 test("excluded pause control does not trigger a static page recapture", async ({
