@@ -288,6 +288,7 @@ function assertCiContract(record) {
   assertExactRuns(
     ci,
     [
+      "git branch --force main origin/main",
       "pnpm install --frozen-lockfile",
       "pnpm exec playwright install --with-deps chromium",
       "pnpm check"
@@ -300,6 +301,13 @@ function assertCiContract(record) {
     checkout?.with?.["fetch-depth"],
     0,
     "CI must fetch full history for Changesets divergence checks"
+  );
+  const prepareBaseBranch = ci.jobs.verify.steps.find(
+    (step) => step.name === "Prepare Changesets base branch"
+  );
+  assert.equal(
+    normalizeCondition(prepareBaseBranch?.if),
+    "github.event_name == 'pull_request'"
   );
 
   const artifacts = actionStep(ci, "actions/upload-artifact");
